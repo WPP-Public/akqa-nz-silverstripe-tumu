@@ -1,0 +1,29 @@
+{
+    "name": "akqa/silverstripe-tumu",
+    "type": "silverstripe-vendormodule",
+    "description": "Foundation for SilverStripe projects at AKQA",
+    "license": "MIT",
+    "version": "6.0.x-dev",
+    "require": {
+        "silverstripe/cms": "^6.1",
+		"silverstripe/userforms": "^7",
+        "heyday/silverstripe-menumanager": "^5",
+        "larapack/dd": "^1.1",
+        "silverstripe/taxonomy": "^4",
+        "silverstripe/tagfield": "^4",
+        "silverstripe/environmentcheck": "^4",
+        "silverstripe/login-forms": "^6",
+        "symbiote/silverstripe-queuedjobs": "^6"
+    },
+    "extra": {
+        "dev-main": "6.0.x-dev"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/vendor-plugin": true
+        }
+    }
+}
