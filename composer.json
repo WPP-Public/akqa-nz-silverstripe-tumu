@@ -3,10 +3,10 @@
     "type": "silverstripe-vendormodule",
     "description": "Foundation for SilverStripe projects at AKQA",
     "license": "MIT",
-    "version": "6.0.x-dev",
     "require": {
         "silverstripe/cms": "^6.1",
 		"silverstripe/userforms": "^7",
+        "dnadesign/silverstripe-elemental": "^6",
         "heyday/silverstripe-menumanager": "^5",
         "larapack/dd": "^1.1",
         "silverstripe/taxonomy": "^4",
