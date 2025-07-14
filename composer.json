@@ -14,7 +14,11 @@
         "silverstripe/environmentcheck": "^4",
         "silverstripe/login-forms": "^6",
         "symbiote/silverstripe-queuedjobs": "^6",
-        "jonom/silverstripe-betternavigator": "^7.0"
+        "jonom/silverstripe-betternavigator": "^7.0",
+        "wilr/silverstripe-googlesitemaps": "^4.0",
+        "unclecheese/display-logic": "^4.0",
+        "silverstripe/redirectedurls": "^4",
+        "silverstripe/sharedraftcontent": "^4.0"
     },
     "extra": {
         "dev-main": "6.x-dev"
