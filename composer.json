@@ -16,7 +16,7 @@
         "symbiote/silverstripe-queuedjobs": "^6"
     },
     "extra": {
-        "dev-main": "6.0.x-dev"
+        "dev-main": "6.x-dev"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
