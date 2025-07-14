@@ -13,7 +13,8 @@
         "silverstripe/tagfield": "^4",
         "silverstripe/environmentcheck": "^4",
         "silverstripe/login-forms": "^6",
-        "symbiote/silverstripe-queuedjobs": "^6"
+        "symbiote/silverstripe-queuedjobs": "^6",
+        "jonom/silverstripe-betternavigator": "^7.0"
     },
     "extra": {
         "dev-main": "6.x-dev"
