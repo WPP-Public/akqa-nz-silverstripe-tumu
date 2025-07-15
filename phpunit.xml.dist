@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="./vendor/silverstripe/cms/tests/bootstrap.php" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+    <coverage includeUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">./src/</directory>
+        </include>
+        <report>
+            <html outputDirectory="/tmp/report" lowUpperBound="35" highLowerBound="70"/>
+            <php outputFile="/tmp/coverage.serialized"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+        </report>
+    </coverage>
+    <testsuite name="Default">
+        <directory>./tests</directory>
+    </testsuite>
+    <logging/>
+    <groups>
+        <exclude>
+            <group>sanitychecks</group>
+        </exclude>
+    </groups>
+    <php>
+        <get name="flush" value="1"/>
+    </php>
+</phpunit>

@@ -20,8 +20,23 @@
         "silverstripe/redirectedurls": "^4",
         "silverstripe/sharedraftcontent": "^4.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^11",
+        "cambis/silverstan": "^2"
+    },
     "extra": {
         "dev-main": "6.x-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Akqa\\SilverStripe\\": "src/"
+        }
+    },
+    "scripts": {
+        "lint": "phpstan analyse",
+        "lint:fix": "phpstan analyse --fix",
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html coverage"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

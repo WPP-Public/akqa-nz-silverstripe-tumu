@@ -1,0 +1,5 @@
+SilverStripe\Core\Injector\Injector:
+  Psr\SimpleCache\CacheInterface.ViteRequirementsManifest:
+    factory: SilverStripe\Core\Cache\CacheFactory
+    constructor:
+      namespace: "ViteRequirementsManifest"
