@@ -18,7 +18,8 @@
         "wilr/silverstripe-googlesitemaps": "^4.0",
         "unclecheese/display-logic": "^4.0",
         "silverstripe/redirectedurls": "^4",
-        "silverstripe/sharedraftcontent": "^4.0"
+        "silverstripe/sharedraftcontent": "^4.0",
+        "silverstripe/htmleditor-tinymce": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^11",
