@@ -26,7 +26,7 @@ trait ViteProvider
 {
     protected string|null $defaultCssAsset = 'app/client/src/index.css';
 
-    protected string|null $defaultJsAsset = 'app/client/src/index.jsx';
+    protected string|null $defaultJsAsset = 'app/client/src/index.tsx';
 
     protected string $packageManager = 'yarn';
 
@@ -54,6 +54,11 @@ trait ViteProvider
         return $this->defaultJsAsset;
     }
 
+
+    public function getPackageManager(): string
+    {
+        return $this->packageManager;
+    }
 
 
     /**
@@ -108,7 +113,7 @@ trait ViteProvider
     }
 
 
-    public function getIncludeViteRequirements(): string
+    public function getIncludeViteBuiltRequirements(): string
     {
         $m = Environment::getEnv('BUILD_VERSION');
 
