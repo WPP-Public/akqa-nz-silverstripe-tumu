@@ -24,9 +24,11 @@ use SilverStripe\View\Requirements;
  */
 trait ViteProvider
 {
-    protected string|null $defaultCssAsset = 'app/client/src/index.css';
+    protected string $defaultCssAsset = 'app/client/src/index.css';
 
-    protected string|null $defaultJsAsset = 'app/client/src/index.tsx';
+    protected string $defaultJsAsset = 'app/client/src/index.ts';
+
+    protected string $distPath = 'app/client/dist/';
 
     protected string $packageManager = 'yarn';
 
@@ -39,6 +41,12 @@ trait ViteProvider
     public function setDefaultJsAsset(string $asset): self
     {
         $this->defaultJsAsset = $asset;
+        return $this;
+    }
+
+    public function setDistPath(string $path): self
+    {
+        $this->distPath = $path;
         return $this;
     }
 
@@ -133,31 +141,36 @@ trait ViteProvider
         }
 
         if (!isset($manifest[$this->defaultCssAsset]) || !isset($manifest[$this->defaultJsAsset])) {
-            throw new Exception('client/dist/manifest.json is missing required entries. Please run `yarn build`');
+            throw new Exception(sprintf(
+                'client/dist/manifest.json is missing required entries. Please run `%s build`',
+                $this->packageManager
+            ));
         }
 
-        $distPath = 'app/client/dist/';
-
         if ($this->defaultCssAsset) {
-            Requirements::css($distPath . $manifest[$this->defaultCssAsset]['file']);
+            Requirements::css($this->distPath . $manifest[$this->defaultCssAsset]['file']);
         }
 
         $resourcesPath = '/_resources/';
         $jsModules = ArrayList::create();
         $jsModules->push(ArrayData::create([
-            'Asset' => $resourcesPath . $distPath . $manifest[$this->defaultJsAsset]['file']
+            'Asset' => Controller::join_links($resourcesPath, $this->distPath, $manifest[$this->defaultJsAsset]['file'])
         ]));
 
         if ($this->hasMethod('getAdditionalRequirements') && ($additional = $this->getAdditionalRequirements())) {
             foreach ($additional as $asset) {
                 if (substr($asset, -4) == '.css' || substr($asset, -5) == '.scss') {
                     if (isset($manifest[$asset])) {
-                        Requirements::css($distPath . $manifest[$asset]['file']);
+                        Requirements::css($this->distPath . $manifest[$asset]['file']);
                     }
                 } else {
                     if (isset($manifest[$asset])) {
                         $jsModules->push(ArrayData::create([
-                            'Asset' => $resourcesPath . $distPath . $manifest[$asset]['file']
+                            'Asset' => Controller::join_links(
+                                $resourcesPath,
+                                $this->distPath,
+                                $manifest[$asset]['file']
+                            )
                         ]));
                     }
                 }
@@ -192,6 +205,12 @@ trait ViteProvider
         }
 
         return $jsModules;
+    }
+
+
+    public function getViteEntryPoint(): string|null
+    {
+        return $this->defaultJsAsset;
     }
 
 

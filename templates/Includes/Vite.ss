@@ -52,7 +52,7 @@
         window.__vite_plugin_react_preamble_installed__ = true
 
         await import('{$ViteBaseHref}/@vite/client');
-        await import('{$ViteBaseHref}/app/client/src/index.tsx');
+        await import('{$ViteBaseHref}/{$ViteEntryPoint}');
     }
 </script>
 

@@ -1,6 +1,6 @@
 # silverstripe-tumu
 
-A unique combination of foundational modules for Silverstripe websites
+A unique combination of foundational modules for Silverstripe websites.
 
 ## 🌟 Install
 
@@ -30,6 +30,7 @@ truth and handle major version upgrades with a single dependency
     Manager](https://github.com/WPP-Public/akqa-nz-silverstripe-menumanager)
 -   [Redirects](https://github.com/silverstripe/silverstripe-redirectedurls)
 -   SEO related improvements (sitemaps, robots)
+-   Vite and SSR integration for building modern front-ends.
 -   🔨more to come
 
 ### Project Setup
@@ -70,6 +71,20 @@ simple as
 
 The `dev` dependencies are used for [GrumPHP](https://github.com/phpro/grumphp)
 and our standard linting rules.
+
+### Front-end assets
+
+This project assumes a default location of javascript, css and images of
+`app/client`. You can use themes if you wish but most of our sites just use a
+single app folder. Under the `app/client` we usually structure it as
+
+```
+app/client
+    /src
+        /js
+        /css
+    /dist
+        .. vite controlled output
 
 ## ❌ What tumu is not
 
