@@ -69,6 +69,13 @@ trait ViteProvider
     }
 
 
+    public function setPackageManager(string $package): self
+    {
+        $this->packageManager = $package;
+        return $this;
+    }
+
+
     /**
      * @return array<string, array<string, string>>
      */
