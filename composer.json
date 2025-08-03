@@ -27,7 +27,9 @@
         "cambis/silverstan": "^2"
     },
     "extra": {
-        "dev-main": "6.x-dev"
+        "branch-alias": {
+            "dev-main": "6.x-dev"
+        }
     },
     "autoload": {
         "psr-4": {
