@@ -6,6 +6,7 @@ use Exception;
 use Psr\SimpleCache\CacheInterface;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Environment;
+use SilverStripe\Control\Controller;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Model\ArrayData;
 use SilverStripe\Model\List\ArrayList;
