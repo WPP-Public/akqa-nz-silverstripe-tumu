@@ -22,6 +22,44 @@ use SilverStripe\View\Requirements;
  *
  * Subclasses should implement the getAdditionalRequirements() method to return
  * an array of additional assets to include.
+ *
+ * Assumes your vite.config is setup similar to the following:
+ *
+ * ```
+ * import { defineConfig } from "vite";
+ * import react from "@vitejs/plugin-react";
+ * import tsconfigPaths from "vite-tsconfig-paths";
+ * import svgr from "vite-plugin-svgr";
+ * import path from "path";
+
+ * // https://vitejs.dev/config/
+ * export default defineConfig({
+ *   plugins: [react(), tsconfigPaths(), svgr()],
+ *   resolve: {
+ *     alias: {
+ *       "@": path.resolve(__dirname, "./app/client/src/"),
+ *     },
+ *   },
+ *   server: {
+ *     host: true,
+ *     cors: true,
+ *     allowedHosts: true,
+ *   },
+ *   publicDir: false,
+ *   build: {
+ *     manifest: "manifest.json",
+ *     emptyOutDir: true,
+ *     outDir: "./app/client/dist",
+ *     copyPublicDir: false,
+ *     rollupOptions: {
+ *       input: {
+ *         index: "./app/client/src/index.tsx",
+ *       },
+ *     },
+ *   },
+ * });
+ *
+ * ```
  */
 trait ViteProvider
 {
@@ -148,7 +186,7 @@ trait ViteProvider
             $manifest = $cache->get($key);
         }
 
-        if (!isset($manifest[$this->defaultCssAsset]) || !isset($manifest[$this->defaultJsAsset])) {
+        if (!isset($manifest[$this->defaultJsAsset])) {
             throw new Exception(sprintf(
                 'client/dist/manifest.json is missing required entries. Please run `%s build`',
                 $this->packageManager
@@ -156,7 +194,9 @@ trait ViteProvider
         }
 
         if ($this->defaultCssAsset) {
-            Requirements::css($this->distPath . $manifest[$this->defaultCssAsset]['file']);
+            if (isset($manifest[$this->defaultCssAsset])) {
+                Requirements::css($this->distPath . $manifest[$this->defaultCssAsset]['file']);
+            }
         }
 
         $resourcesPath = '/_resources/';
@@ -164,6 +204,13 @@ trait ViteProvider
         $jsModules->push(ArrayData::create([
             'Asset' => Controller::join_links($resourcesPath, $this->distPath, $manifest[$this->defaultJsAsset]['file'])
         ]));
+
+        // if the default js as a 'css' entry, add it to the requirements
+        if (isset($manifest[$this->defaultJsAsset]['css'])) {
+            foreach ($manifest[$this->defaultJsAsset]['css'] as $css) {
+                Requirements::css($this->distPath . $css);
+            }
+        }
 
         if ($this->hasMethod('getAdditionalRequirements') && ($additional = $this->getAdditionalRequirements())) {
             foreach ($additional as $asset) {
@@ -180,6 +227,13 @@ trait ViteProvider
                                 $manifest[$asset]['file']
                             )
                         ]));
+
+                        // handle css entries
+                        if (isset($manifest[$asset]['css'])) {
+                            foreach ($manifest[$asset]['css'] as $css) {
+                                Requirements::css($this->distPath . $css);
+                            }
+                        }
                     }
                 }
             }

@@ -74,9 +74,9 @@ and our standard linting rules.
 
 ### Front-end assets
 
-This project assumes a default location of javascript, css and images of
-`app/client`. You can use themes if you wish but most of our sites just use a
-single app folder. Under the `app/client` we usually structure it as
+For this we assume a default location of javascript, css and images of
+`app/client`. You can use themes if you wish but most of our sites use a single
+app directory. Under the `app/client` we usually structure it as
 
 ```
 app/client
@@ -85,6 +85,49 @@ app/client
         /css
     /dist
         .. vite controlled output
+```
+
+Tumu provides a `ViteProvider` trait which extracts our handling of importing
+Vite requirements (but not the running of the Vite process, you will need to
+update your environment to physically build or run the hot-reload server).
+
+```php
+<?php
+
+use Akqa\SilverStripe\Traits\ViteProvider;
+
+class PageController extends ContentController
+{
+    use ViteProvider;
+
+}
+```
+
+In your `Page.ss` template include the following `<% include Vite %>`.
+By default, this will handle the hot-reload and requirements for 2 entry points
+`app/client/src/index.ts` and `app/client/src/index.css`. To rename or change
+these entrypoints, use the API on ViteProvider
+
+```php
+<?php
+
+use Akqa\SilverStripe\Traits\ViteProvider;
+
+class PageController extends ContentController
+{
+    use ViteProvider;
+
+    protected function init()
+    {
+        parent::init();
+
+        $this->setPackageManager('pnpm');
+        $this->setDefaultCssAsset('app/client/src/style.css')
+    }
+
+}
+```
+
 
 ## ❌ What tumu is not
 

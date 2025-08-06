@@ -1,7 +1,7 @@
 
 <% if $IsDev %>
 <% if $IsDevHot %>
-<script type="module" nonce="{$Nonce}">
+<script type="module" <% if $Nonce %>nonce="{$Nonce}"<% end_if %>>
     const loadModule = async (modulePath) => {
         try {
             return await import(modulePath)
@@ -42,7 +42,7 @@
     await loadModule('{$ViteBaseHref}/@react-refresh');
 </script>
 
-<script type="module" nonce="{$Nonce}">
+<script type="module" <% if $Nonce %>nonce="{$Nonce}"<% end_if %>>
     import RefreshRuntime from '{$ViteBaseHref}/@react-refresh'
 
     if (RefreshRuntime) {
@@ -56,15 +56,10 @@
     }
 </script>
 
-<% if $HotAdditionalRequirements %>
-<% loop $HotAdditionalRequirements %>
-<!-- additional requirements -->
+<% if $HotAdditionalRequirements %><% loop $HotAdditionalRequirements %><!-- additional requirements -->
 <script type="module" nonce="{$Up.Nonce}" src="{$Up.ViteBaseHref}/{$Asset}"></script>
-<% end_loop %>
-<% end_if %>
+<% end_loop %><% end_if %><% else %>
+$IncludeViteBuiltRequirements.RAW<% end_if %>
 <% else %>
-$IncludeViteBuiltRequirements
-<% end_if %>
-<% else %>
-$IncludeViteBuiltRequirements
+$IncludeViteBuiltRequirements.RAW
 <% end_if %>
