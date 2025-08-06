@@ -188,7 +188,8 @@ trait ViteProvider
 
         if (!isset($manifest[$this->defaultJsAsset])) {
             throw new Exception(sprintf(
-                'client/dist/manifest.json is missing required entries. Please run `%s build`',
+                '%s is missing from client/dist/manifest.json. Please run `%s build`',
+                $this->defaultJsAsset,
                 $this->packageManager
             ));
         }
