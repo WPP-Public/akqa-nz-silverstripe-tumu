@@ -4,7 +4,7 @@
     "description": "Foundation for SilverStripe projects at AKQA",
     "license": "MIT",
     "require": {
-        "silverstripe/cms": "^6.1",
+        "silverstripe/cms": "^6.0",
 		"silverstripe/userforms": "^7",
         "dnadesign/silverstripe-elemental": "^6",
         "heyday/silverstripe-menumanager": "^5",
@@ -42,7 +42,6 @@
         "test": "phpunit",
         "test:coverage": "phpunit --coverage-html coverage"
     },
-    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
