@@ -294,8 +294,6 @@ trait ViteProvider
 
     public function isDevHot(): bool
     {
-        return false;
-
         if (Environment::getEnv('SS_ENVIRONMENT_TYPE') == 'dev') {
             if (Environment::getEnv('SS_USE_VITE_DEV_SERVER') == 'true') {
 
