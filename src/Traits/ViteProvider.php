@@ -206,12 +206,17 @@ trait ViteProvider
             'Asset' => Controller::join_links($resourcesPath, $this->distPath, $manifest[$this->defaultJsAsset]['file'])
         ]));
 
-        // if the default js as a 'css' entry, add it to the requirements
-        if (isset($manifest[$this->defaultJsAsset]['css'])) {
-            foreach ($manifest[$this->defaultJsAsset]['css'] as $css) {
-                Requirements::css($this->distPath . $css);
+        $this->importCssAssets($manifest[$this->defaultJsAsset]);
+
+        if (isset($manifest[$this->defaultJsAsset]['imports'])) {
+            foreach ($manifest[$this->defaultJsAsset]['imports'] as $import) {
+                if (isset($manifest[$import])) {
+                    $this->importCssAssets($manifest[$import]);
+                }
             }
         }
+
+        // if the default js asset imports js then also import all the css files that are imp
 
         if ($this->hasMethod('getAdditionalRequirements') && ($additional = $this->getAdditionalRequirements())) {
             foreach ($additional as $asset) {
@@ -243,6 +248,16 @@ trait ViteProvider
         return $this->renderWith('Includes/ViteRequirements', [
             'JSModules' => $jsModules,
         ]);
+    }
+
+
+    public function importCssAssets(array $manifest): void
+    {
+        if (isset($manifest['css'])) {
+            foreach ($manifest['css'] as $css) {
+                Requirements::css($this->distPath . $css);
+            }
+        }
     }
 
 
@@ -279,6 +294,8 @@ trait ViteProvider
 
     public function isDevHot(): bool
     {
+        return false;
+
         if (Environment::getEnv('SS_ENVIRONMENT_TYPE') == 'dev') {
             if (Environment::getEnv('SS_USE_VITE_DEV_SERVER') == 'true') {
 
