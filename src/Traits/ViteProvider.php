@@ -201,7 +201,9 @@ trait ViteProvider
         }
 
         $resourcesPath = '/_resources/';
+
         $jsModules = ArrayList::create();
+
         $jsModules->push(ArrayData::create([
             'Asset' => Controller::join_links($resourcesPath, $this->distPath, $manifest[$this->defaultJsAsset]['file'])
         ]));
@@ -224,20 +226,26 @@ trait ViteProvider
                     if (isset($manifest[$asset])) {
                         Requirements::css($this->distPath . $manifest[$asset]['file']);
                     }
-                } else {
-                    if (isset($manifest[$asset])) {
-                        $jsModules->push(ArrayData::create([
-                            'Asset' => Controller::join_links(
-                                $resourcesPath,
-                                $this->distPath,
-                                $manifest[$asset]['file']
-                            )
-                        ]));
+                } else if (isset($manifest[$asset])) {
+                    $jsModules->push(ArrayData::create([
+                        'Asset' => Controller::join_links(
+                            $resourcesPath,
+                            $this->distPath,
+                            $manifest[$asset]['file']
+                        )
+                    ]));
 
-                        // handle css entries
-                        if (isset($manifest[$asset]['css'])) {
-                            foreach ($manifest[$asset]['css'] as $css) {
-                                Requirements::css($this->distPath . $css);
+                    // handle css entries
+                    if (isset($manifest[$asset]['css'])) {
+                        foreach ($manifest[$asset]['css'] as $css) {
+                            Requirements::css($this->distPath . $css);
+                        }
+                    }
+
+                    if (isset($manifest[$asset]['imports'])) {
+                        foreach ($manifest[$asset]['imports'] as $import) {
+                            if (isset($manifest[$import])) {
+                                $this->importCssAssets($manifest[$import]);
                             }
                         }
                     }
