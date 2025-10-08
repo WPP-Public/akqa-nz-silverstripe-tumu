@@ -14,13 +14,14 @@
         "silverstripe/environmentcheck": "^4",
         "silverstripe/login-forms": "^6",
         "symbiote/silverstripe-queuedjobs": "^6",
-        "jonom/silverstripe-betternavigator": "^7.0",
-        "wilr/silverstripe-googlesitemaps": "^4.0",
-        "unclecheese/display-logic": "^4.0",
+        "jonom/silverstripe-betternavigator": "^7",
+        "wilr/silverstripe-googlesitemaps": "^4",
+        "unclecheese/display-logic": "^4",
         "silverstripe/redirectedurls": "^4",
-        "silverstripe/sharedraftcontent": "^4.0",
-        "silverstripe/htmleditor-tinymce": "^1.0",
-        "jonom/focuspoint": "^6.0",
+        "silverstripe/sharedraftcontent": "^4",
+        "silverstripe/htmleditor-tinymce": "^1",
+        "silverstripe/mfa": "^6"
+        "jonom/focuspoint": "^6",
         "silverstripe/linkfield": "^5.0"
     },
     "require-dev": {
