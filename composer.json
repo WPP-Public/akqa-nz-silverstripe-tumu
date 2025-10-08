@@ -20,7 +20,7 @@
         "silverstripe/redirectedurls": "^4",
         "silverstripe/sharedraftcontent": "^4",
         "silverstripe/htmleditor-tinymce": "^1",
-        "silverstripe/mfa": "^6"
+        "silverstripe/totp-authenticator": "^6"
         "jonom/focuspoint": "^6",
         "silverstripe/linkfield": "^5.0"
     },
