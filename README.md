@@ -1,5 +1,7 @@
 # silverstripe-tumu
 
+[![CI](https://github.com/WPP-Public/akqa-nz-silverstripe-tumu/actions/workflows/ci.yml/badge.svg)](https://github.com/WPP-Public/akqa-nz-silverstripe-tumu/actions/workflows/ci.yml)
+
 A unique combination of foundational modules for Silverstripe websites.
 
 ## 🌟 Install
