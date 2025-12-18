@@ -68,7 +68,7 @@ class ViteProviderTest extends SapphireTest
         $result = $this->testClass->setDefaultJsAsset('test.jsx');
 
         $this->assertSame($this->testClass, $result);
-        $this->assertEquals('test.jsx', $this->testClass->getDeaf);
+        $this->assertEquals('test.jsx', $this->testClass->getDefaultJsAsset());
     }
 
     public function testBuildRequirementsManifestWithMissingFile(): void
@@ -148,7 +148,7 @@ class ViteProviderTest extends SapphireTest
         );
     }
 
-    public function testGetIncludeViteRequirementsWithMissingManifestEntries(): void
+    public function testGetIncludeViteBuiltRequirementsWithMissingManifestEntries(): void
     {
         // Create a temporary manifest file with missing entries
         $manifestPath = Director::baseFolder() . '/app/client/dist/manifest.json';
@@ -166,10 +166,10 @@ class ViteProviderTest extends SapphireTest
         file_put_contents($manifestPath, json_encode($manifestData));
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('client/dist/manifest.json is missing required entries. Please run `yarn build`');
+        $this->expectExceptionMessage('app/client/src/index.ts is missing from client/dist/manifest.json');
 
         try {
-            $this->testClass->getIncludeViteRequirements();
+            $this->testClass->getIncludeViteBuiltRequirements();
         } finally {
             // Clean up
             if (file_exists($manifestPath)) {
@@ -190,9 +190,7 @@ class ViteProviderTest extends SapphireTest
 
         $manifestData = [
             'app/client/src/index.css' => ['file' => 'index.css'],
-            'app/client/src/index.jsx' => ['file' => 'index.jsx'],
-            'app/client/src/additional.css' => ['file' => 'additional.css'],
-            'app/client/src/additional.jsx' => ['file' => 'additional.jsx']
+            'app/client/src/index.ts' => ['file' => 'index.ts']
         ];
 
         file_put_contents($manifestPath, json_encode($manifestData));
@@ -206,12 +204,11 @@ class ViteProviderTest extends SapphireTest
         Injector::inst()->registerService($mockCache, CacheInterface::class . '.ViteRequirementsManifest');
 
         try {
-            $result = $this->testClass->getIncludeViteRequirements();
+            $result = $this->testClass->getIncludeViteBuiltRequirements();
 
             // Should return rendered template
             $this->assertStringContainsString('script type="module"', $result);
-            $this->assertStringContainsString('index.jsx', $result);
-            $this->assertStringContainsString('additional.jsx', $result);
+            $this->assertStringContainsString('index.ts', $result);
 
             // Check that CSS was added to Requirements
             $this->assertTrue(Requirements::backend()->getCSS() !== []);
@@ -223,7 +220,7 @@ class ViteProviderTest extends SapphireTest
         }
     }
 
-    public function testGetIncludeViteRequirementsWithCachedManifest(): void
+    public function testGetIncludeViteBuiltRequirementsWithCachedManifest(): void
     {
         // Create a temporary valid manifest file
         $manifestPath = Director::baseFolder() . '/app/client/dist/manifest.json';
@@ -235,7 +232,7 @@ class ViteProviderTest extends SapphireTest
 
         $manifestData = [
             'app/client/src/index.css' => ['file' => 'index.css'],
-            'app/client/src/index.jsx' => ['file' => 'index.jsx']
+            'app/client/src/index.ts' => ['file' => 'index.ts']
         ];
 
         file_put_contents($manifestPath, json_encode($manifestData));
@@ -248,11 +245,11 @@ class ViteProviderTest extends SapphireTest
         Injector::inst()->registerService($mockCache, CacheInterface::class . '.ViteRequirementsManifest');
 
         try {
-            $result = $this->testClass->getIncludeViteRequirements();
+            $result = $this->testClass->getIncludeViteBuiltRequirements();
 
             // Should return rendered template
             $this->assertStringContainsString('script type="module"', $result);
-            $this->assertStringContainsString('index.jsx', $result);
+            $this->assertStringContainsString('index.ts', $result);
         } finally {
             // Clean up
             if (file_exists($manifestPath)) {
@@ -275,7 +272,7 @@ class ViteProviderTest extends SapphireTest
 
     public function testGetHotAdditionalRequirementsWithNoAdditionalRequirements(): void
     {
-        $testClass = new TestViteProviderClassWithoutAdditionalRequirements();
+        $testClass = TestViteProviderClassWithoutAdditionalRequirements::create();
 
         $result = $testClass->getHotAdditionalRequirements();
 

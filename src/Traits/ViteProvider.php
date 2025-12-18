@@ -259,9 +259,12 @@ trait ViteProvider
     }
 
 
+    /**
+     * @param array<string, array<string, string>> $manifest
+     */
     public function importCssAssets(array $manifest): void
     {
-        if (isset($manifest['css'])) {
+        if (isset($manifest['css']) && is_array($manifest['css'])) {
             foreach ($manifest['css'] as $css) {
                 Requirements::css($this->distPath . $css);
             }
