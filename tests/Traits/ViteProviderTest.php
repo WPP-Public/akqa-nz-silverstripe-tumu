@@ -25,7 +25,10 @@ class TestViteProviderClass extends Controller
     {
         return [
             'app/client/src/additional.css',
-            'app/client/src/additional.jsx'
+            'app/client/src/additional.jsx',
+            'app/client/src/print.css' => [
+                'media' => 'print'
+            ]
         ];
     }
 }
@@ -268,7 +271,20 @@ class ViteProviderTest extends SapphireTest
         $firstItem = $result->first();
         $this->assertInstanceOf(ArrayData::class, $firstItem);
         $this->assertEquals('app/client/src/additional.jsx', $firstItem->Asset);
+
+        // Verify that CSS files (additional.css and print.css) were added to Requirements
+        // CSS files are added directly to Requirements, not returned in the ArrayList
+        $css = Requirements::backend()->getCSS();
+        $this->assertNotEmpty($css);
+
+        // assert key exists in css array
+        $this->assertArrayHasKey('app/client/src/print.css', $css);
+
+        $printCss = $css['app/client/src/print.css'];
+        $this->assertNotEmpty($printCss);
+        $this->assertEquals('print', $printCss['media']);
     }
+
 
     public function testGetHotAdditionalRequirementsWithNoAdditionalRequirements(): void
     {
@@ -322,5 +338,63 @@ class ViteProviderTest extends SapphireTest
         $result = $this->testClass->isDevHot();
 
         $this->assertFalse($result);
+    }
+
+    public function testGetIncludeViteBuiltRequirementsWithAdditionalRequirementsIncludingPrintCss(): void
+    {
+        // Create a temporary valid manifest file with additional requirements including print.css
+        $manifestPath = Director::baseFolder() . '/app/client/dist/manifest.json';
+        $dir = dirname($manifestPath);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $manifestData = [
+            'app/client/src/index.css' => ['file' => 'index.css'],
+            'app/client/src/index.ts' => ['file' => 'index.ts'],
+            'app/client/src/additional.css' => ['file' => 'additional.css'],
+            'app/client/src/additional.jsx' => ['file' => 'additional.jsx'],
+            'app/client/src/print.css' => ['file' => 'print.css']
+        ];
+
+        file_put_contents($manifestPath, json_encode($manifestData));
+
+        // Mock cache
+        $mockCache = $this->createMock(CacheInterface::class);
+        $mockCache->method('has')->willReturn(false);
+        $mockCache->method('set')->willReturn(true);
+        $mockCache->method('get')->willReturn($manifestData);
+
+        Injector::inst()->registerService($mockCache, CacheInterface::class . '.ViteRequirementsManifest');
+
+        try {
+            $result = $this->testClass->getIncludeViteBuiltRequirements();
+
+            // Should return rendered template
+            $this->assertStringContainsString('script type="module"', $result);
+            $this->assertStringContainsString('index.ts', $result);
+            $this->assertStringContainsString('additional.jsx', $result);
+
+            // Check that CSS files including print.css were added to Requirements
+            $css = Requirements::backend()->getCSS();
+            $this->assertNotEmpty($css);
+
+            // Verify print.css is included
+            $cssFiles = array_keys($css);
+            $printCssFound = false;
+            foreach ($cssFiles as $cssFile) {
+                if (strpos($cssFile, 'print.css') !== false) {
+                    $printCssFound = true;
+                    break;
+                }
+            }
+            $this->assertTrue($printCssFound, 'print.css should be included in Requirements');
+        } finally {
+            // Clean up
+            if (file_exists($manifestPath)) {
+                unlink($manifestPath);
+            }
+        }
     }
 }

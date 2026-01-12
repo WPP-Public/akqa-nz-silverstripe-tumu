@@ -130,6 +130,34 @@ class PageController extends ContentController
 }
 ```
 
+To include additional CSS or JavaScript files (such as print stylesheets), implement the `getAdditionalRequirements()` method:
+
+```php
+<?php
+
+use Akqa\SilverStripe\Traits\ViteProvider;
+
+class PageController extends ContentController
+{
+    use ViteProvider;
+
+    /**
+     * @return array<string>
+     */
+    public function getAdditionalRequirements(): array
+    {
+        return [
+            'app/client/src/print.css' => [
+                'media' => 'print'
+            ],
+            'app/client/src/additional.jsx'
+        ];
+    }
+}
+```
+
+The `getAdditionalRequirements()` method should return an array of asset paths relative to your Vite source directory. CSS files (`.css` or `.scss`) will be automatically included in the page requirements, while JavaScript files will be loaded as modules. This is useful for including print stylesheets, page-specific styles, or additional JavaScript modules.
+
 
 ## ❌ What tumu is not
 

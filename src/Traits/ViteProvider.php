@@ -71,9 +71,15 @@ trait ViteProvider
 
     protected string $packageManager = 'yarn';
 
-    public function setDefaultCssAsset(string $asset): self
+    protected string|null $defaultCssMedia = null;
+
+    protected array $defaultCssOpts = [];
+
+    public function setDefaultCssAsset(string $asset, string|null $media = null, array $opts = []): self
     {
         $this->defaultCssAsset = $asset;
+        $this->defaultCssMedia = $media;
+        $this->defaultCssOpts = $opts;
         return $this;
     }
 
@@ -208,12 +214,12 @@ trait ViteProvider
             'Asset' => Controller::join_links($resourcesPath, $this->distPath, $manifest[$this->defaultJsAsset]['file'])
         ]));
 
-        $this->importCssAssets($manifest[$this->defaultJsAsset]);
+        $this->importCssAssets($manifest[$this->defaultJsAsset], $this->defaultCssMedia, $this->defaultCssOpts);
 
         if (isset($manifest[$this->defaultJsAsset]['imports'])) {
             foreach ($manifest[$this->defaultJsAsset]['imports'] as $import) {
                 if (isset($manifest[$import])) {
-                    $this->importCssAssets($manifest[$import]);
+                    $this->importCssAssets($manifest[$import], $this->defaultCssMedia, $this->defaultCssOpts);
                 }
             }
         }
@@ -221,10 +227,24 @@ trait ViteProvider
         // if the default js asset imports js then also import all the css files that are imp
 
         if ($this->hasMethod('getAdditionalRequirements') && ($additional = $this->getAdditionalRequirements())) {
-            foreach ($additional as $asset) {
+            foreach ($additional as $k => $asset) {
+                $opts = [];
+                $media = null;
+
+                if (is_array($asset)) {
+                    $opts = $asset;
+                    $asset = $k;
+
+                    if (isset($opts['media'])) {
+                        $media = $opts['media'];
+                        unset($opts['media']);
+                    }
+                }
+
                 if (substr($asset, -4) == '.css' || substr($asset, -5) == '.scss') {
+
                     if (isset($manifest[$asset])) {
-                        Requirements::css($this->distPath . $manifest[$asset]['file']);
+                        Requirements::css($this->distPath . $manifest[$asset]['file'], $media, $opts);
                     }
                 } else if (isset($manifest[$asset])) {
                     $jsModules->push(ArrayData::create([
@@ -238,14 +258,14 @@ trait ViteProvider
                     // handle css entries
                     if (isset($manifest[$asset]['css'])) {
                         foreach ($manifest[$asset]['css'] as $css) {
-                            Requirements::css($this->distPath . $css);
+                            Requirements::css($this->distPath . $css, $media, $opts);
                         }
                     }
 
                     if (isset($manifest[$asset]['imports'])) {
                         foreach ($manifest[$asset]['imports'] as $import) {
                             if (isset($manifest[$import])) {
-                                $this->importCssAssets($manifest[$import]);
+                                $this->importCssAssets($manifest[$import], $media, $opts);
                             }
                         }
                     }
@@ -261,12 +281,14 @@ trait ViteProvider
 
     /**
      * @param array<string, array<string, string>> $manifest
+     * @param string|null $media
+     * @param array<string, string> $opts
      */
-    public function importCssAssets(array $manifest): void
+    public function importCssAssets(array $manifest, string|null $media = null, array $opts = []): void
     {
         if (isset($manifest['css']) && is_array($manifest['css'])) {
             foreach ($manifest['css'] as $css) {
-                Requirements::css($this->distPath . $css);
+                Requirements::css($this->distPath . $css, $media, $opts);
             }
         }
     }
@@ -282,12 +304,26 @@ trait ViteProvider
         if ($this->hasMethod('getAdditionalRequirements')) {
             $pageAssets = $this->getAdditionalRequirements();
 
-            foreach ($pageAssets as $asset) {
+            foreach ($pageAssets as $k => $asset) {
+                $opts = [];
+                $media = null;
+
+                if (is_array($asset)) {
+                    $opts = $asset;
+                    $asset = $k;
+
+                    if (isset($opts['media'])) {
+                        $media = $opts['media'];
+                        unset($opts['media']);
+                    }
+                }
+
                 if (substr($asset, -4) == '.css' || substr($asset, -5) == '.scss') {
-                    Requirements::css($asset);
+                    Requirements::css($asset, $media, $opts);
                 } else {
                     $jsModules->push(ArrayData::create([
-                        'Asset' => $asset
+                        'Asset' => $asset,
+                        'Opts' => ArrayData::create($opts),
                     ]));
                 }
             }
