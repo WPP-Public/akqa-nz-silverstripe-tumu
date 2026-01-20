@@ -6,6 +6,7 @@
     "require": {
         "silverstripe/framework": "^6.1",
         "silverstripe/cms": "^6.1",
+        "silverstripe/errorpage": "^3",
 		"silverstripe/userforms": "^7",
         "dnadesign/silverstripe-elemental": "^6",
         "heyday/silverstripe-menumanager": "^5",
