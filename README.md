@@ -33,6 +33,7 @@ truth and handle major version upgrades with a single dependency
 -   [Redirects](https://github.com/silverstripe/silverstripe-redirectedurls)
 -   SEO related improvements (sitemaps, robots)
 -   Vite and SSR integration for building modern front-ends.
+-   Extensions for common functionality (Sorting, )
 -   🔨more to come
 
 ### Project Setup
@@ -105,8 +106,8 @@ class PageController extends ContentController
 }
 ```
 
-In your `Page.ss` template include the following `<% include Vite %>`.
-By default, this will handle the hot-reload and requirements for 2 entry points
+In your `Page.ss` template include the following `<% include Vite %>`. By
+default, this will handle the hot-reload and requirements for 2 entry points
 `app/client/src/index.ts` and `app/client/src/index.css`. To rename or change
 these entrypoints, use the API on ViteProvider
 
@@ -130,7 +131,8 @@ class PageController extends ContentController
 }
 ```
 
-To include additional CSS or JavaScript files (such as print stylesheets), implement the `getAdditionalRequirements()` method:
+To include additional CSS or JavaScript files (such as print stylesheets),
+implement the `getAdditionalRequirements()` method:
 
 ```php
 <?php
@@ -156,7 +158,11 @@ class PageController extends ContentController
 }
 ```
 
-The `getAdditionalRequirements()` method should return an array of asset paths relative to your Vite source directory. CSS files (`.css` or `.scss`) will be automatically included in the page requirements, while JavaScript files will be loaded as modules. This is useful for including print stylesheets, page-specific styles, or additional JavaScript modules.
+The `getAdditionalRequirements()` method should return an array of asset paths
+relative to your Vite source directory. CSS files (`.css` or `.scss`) will be
+automatically included in the page requirements, while JavaScript files will be
+loaded as modules. This is useful for including print stylesheets, page-specific
+styles, or additional JavaScript modules.
 
 
 ## ❌ What tumu is not
@@ -172,7 +178,7 @@ use them in less than half of the active supported clients and these
 dramatically alter the CMS interface.
 
 There is also an assumption that this is used for your typical stock standard
-website and not slightly more left field projects (i.e framework only APIs).
+website and not slightly more left field projects (i.e framework-only).
 
 ## 🔗 See also
 

@@ -9,9 +9,3 @@ jobs:
   ci:
     name: CI
     uses: silverstripe/gha-ci/.github/workflows/ci.yml@v2
-    with:
-      dynamic_matrix: false
-      extra_jobs: |
-        - php: '8.4'
-          db: mysql80
-          phpunit: true
