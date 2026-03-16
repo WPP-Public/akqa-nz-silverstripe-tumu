@@ -3,6 +3,9 @@
     "type": "silverstripe-vendormodule",
     "description": "Foundation for SilverStripe projects at AKQA",
     "license": "MIT",
+    "bin": [
+        "bin/tag_release"
+    ],
     "require": {
         "silverstripe/framework": "^6.1",
         "silverstripe/cms": "^6.1",

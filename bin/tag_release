@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -e
+
+# Display last 5 git tags (version-sorted, newest first)
+echo "=== Last 5 tags ==="
+git tag -l --sort=-version:refname 2>/dev/null | head -5
+echo ""
+
+# Suggest semver bump based on changes vs main
+suggest_version() {
+  local base_ref="main"
+  if ! git rev-parse --verify "$base_ref" &>/dev/null; then
+    echo "patch"  # fallback if main doesn't exist
+    return
+  fi
+
+  local commit_count
+  commit_count=$(git rev-list --count "$base_ref"..HEAD 2>/dev/null || echo "0")
+
+  if [[ "$commit_count" -eq 0 ]]; then
+    echo "patch"
+    return
+  fi
+
+  # Check for conventional commits in range main..HEAD
+  local has_breaking=0
+  local has_feat=0
+  local has_fix=0
+
+  while IFS= read -r msg; do
+    [[ -z "$msg" ]] && continue
+    if [[ "$msg" =~ BREAKING[[:space:]]CHANGE ]]; then has_breaking=1; fi
+    if [[ "$msg" =~ ^[a-z]+! ]]; then has_breaking=1; fi
+    if [[ "$msg" =~ ^[a-z]+\(.*\)! ]]; then has_breaking=1; fi
+    if [[ "$msg" =~ ^feat ]]; then has_feat=1; fi
+    if [[ "$msg" =~ ^fix ]]; then has_fix=1; fi
+  done < <(git log --no-merges --format=%s "$base_ref"..HEAD 2>/dev/null)
+
+  if [[ "$has_breaking" -eq 1 ]]; then
+    echo "major"
+  elif [[ "$has_feat" -eq 1 ]]; then
+    echo "minor"
+  elif [[ "$has_fix" -eq 1 ]] || [[ "$commit_count" -gt 0 ]]; then
+    echo "patch"
+  else
+    echo "patch"
+  fi
+}
+
+bump_type=$(suggest_version)
+echo "Changes vs \`main\`: $(git rev-list --count main..HEAD 2>/dev/null || echo "0") commits"
+echo "Suggested bump type: $bump_type (semver: major.minor.patch)"
+echo ""
+
+# Prompt for release version
+read -r -p "Enter release version (e.g. 1.2.3): " version
+if [[ -z "$version" ]]; then
+  echo "No version entered. Exiting."
+  exit 1
+fi
+
+# Basic semver format check (allow v prefix)
+if [[ ! "$version" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$ ]]; then
+  echo "Warning: '$version' doesn't look like semver (e.g. 1.2.3 or v1.2.3)."
+  read -r -p "Create tag anyway? [y/N]: " confirm
+  if [[ ! "$confirm" =~ ^[yY] ]]; then
+    echo "Aborted."
+    exit 1
+  fi
+fi
+
+# Ensure tag has v prefix for consistency if user didn't add it
+tag_name="$version"
+[[ "$tag_name" != v* ]] && tag_name="v$version"
+
+if git rev-parse "$tag_name" &>/dev/null; then
+  echo "Tag \`$tag_name\` already exists. Aborting."
+  exit 1
+fi
+
+echo "Creating tag: $tag_name"
+git tag -a "$tag_name" -m "Release $tag_name"
+echo "Tag \`$tag_name\` created. Push with: git push origin $tag_name"
