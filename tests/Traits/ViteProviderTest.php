@@ -2,10 +2,8 @@
 
 namespace Akqa\SilverStripe\Tests\Traits;
 
-use Akqa\SilverStripe\Traits\ViteProvider;
 use Exception;
 use Psr\SimpleCache\CacheInterface;
-use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Injector\Injector;
@@ -13,30 +11,6 @@ use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Model\ArrayData;
 use SilverStripe\Model\List\ArrayList;
 use SilverStripe\View\Requirements;
-
-class TestViteProviderClass extends Controller
-{
-    use ViteProvider;
-
-    /**
-     * @return array<string>
-     */
-    public function getAdditionalRequirements(): array
-    {
-        return [
-            'app/client/src/additional.css',
-            'app/client/src/additional.jsx',
-            'app/client/src/print.css' => [
-                'media' => 'print'
-            ]
-        ];
-    }
-}
-
-class TestViteProviderClassWithoutAdditionalRequirements extends Controller
-{
-    use ViteProvider;
-}
 
 class ViteProviderTest extends SapphireTest
 {

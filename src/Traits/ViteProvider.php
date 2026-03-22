@@ -83,12 +83,27 @@ trait ViteProvider
         return $this;
     }
 
+
+    /**
+     * Sets the default JavaScript asset to be included
+     * (i.e index.tsx or index.ts) depending on the Vite config.
+     *
+     * @param string $asset
+     * @return self
+     */
     public function setDefaultJsAsset(string $asset): self
     {
         $this->defaultJsAsset = $asset;
         return $this;
     }
 
+
+    /**
+     * Sets the path to the Vite dist directory.
+     *
+     * @param string $path
+     * @return self
+     */
     public function setDistPath(string $path): self
     {
         $this->distPath = $path;
@@ -108,6 +123,11 @@ trait ViteProvider
     }
 
 
+    /**
+     * Returns the package manager used to build the Vite assets (i.e yarn, pnpm, npm).
+     *
+     * @return string
+     */
     public function getPackageManager(): string
     {
         return $this->packageManager;
@@ -155,6 +175,13 @@ trait ViteProvider
     }
 
 
+    /**
+     * Returns the base href for the Vite dev server running in the local
+     * environment. Make sure this matches the port used in the Vite config
+     * and exposed via DDEV's config.yaml file.
+     *
+     * @return string
+     */
     public function getViteBaseHref(): string
     {
         $base = explode(':', Director::absoluteBaseURL());
@@ -190,6 +217,11 @@ trait ViteProvider
             $cache->set($key, $manifest);
         } else {
             $manifest = $cache->get($key);
+
+            if (!$manifest || empty($manifest) || !is_array($manifest)) {
+                $manifest = $this->buildRequirementsManifest();
+                $cache->set($key, $manifest);
+            }
         }
 
         if (!isset($manifest[$this->defaultJsAsset])) {
@@ -242,11 +274,10 @@ trait ViteProvider
                 }
 
                 if (substr($asset, -4) == '.css' || substr($asset, -5) == '.scss') {
-
                     if (isset($manifest[$asset])) {
                         Requirements::css($this->distPath . $manifest[$asset]['file'], $media, $opts);
                     }
-                } else if (isset($manifest[$asset])) {
+                } elseif (isset($manifest[$asset])) {
                     $jsModules->push(ArrayData::create([
                         'Asset' => Controller::join_links(
                             $resourcesPath,
@@ -343,7 +374,6 @@ trait ViteProvider
     {
         if (Environment::getEnv('SS_ENVIRONMENT_TYPE') == 'dev') {
             if (Environment::getEnv('SS_USE_VITE_DEV_SERVER') == 'true') {
-
                 return true;
             }
         }

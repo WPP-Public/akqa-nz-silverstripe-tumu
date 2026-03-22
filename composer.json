@@ -47,9 +47,16 @@
             "Akqa\\SilverStripe\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Akqa\\SilverStripe\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
-        "lint": "phpstan analyse",
-        "lint:fix": "phpstan analyse --fix",
+        "lint": "phpcs",
+        "lint:fix": "phpcbf",
+        "analyse": "phpstan analyse",
+        "analyse:fix": "phpstan analyse --fix",
         "test": "phpunit",
         "test:coverage": "phpunit --coverage-html coverage"
     },
