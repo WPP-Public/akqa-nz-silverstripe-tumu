@@ -30,7 +30,8 @@
         "silverstripe/linkfield": "^5",
         "silverstripe/mfa": "^6.1",
         "silverstripe/spamprotection": "^5.0",
-        "nesbot/carbon": "^3.11"
+        "nesbot/carbon": "^3.11",
+        "kinglozzer/metatitle": "^4.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^11",
