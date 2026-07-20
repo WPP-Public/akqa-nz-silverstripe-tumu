@@ -7,8 +7,8 @@
         "bin/tag_release"
     ],
     "require": {
-        "silverstripe/framework": "^6.1",
-        "silverstripe/cms": "^6.1",
+        "silverstripe/framework": "^6.2",
+        "silverstripe/cms": "^6.2",
         "silverstripe/errorpage": "^3",
 		"silverstripe/userforms": "^7",
         "dnadesign/silverstripe-elemental": "^6",
