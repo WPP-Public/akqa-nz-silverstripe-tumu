@@ -3,3 +3,5 @@ SilverStripe\Core\Injector\Injector:
     factory: SilverStripe\Core\Cache\CacheFactory
     constructor:
       namespace: "ViteRequirementsManifest"
+      defaultLifetime: 604800 # 7 days
+
