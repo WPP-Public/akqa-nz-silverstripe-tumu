@@ -7,4 +7,6 @@
 
     <file>src</file>
     <file>tests</file>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>tests/SSR/fixtures/*</exclude-pattern>
 </ruleset>

@@ -1,0 +1,9 @@
+{
+  "name": "akqa-silverstripe-tumu-ssr-fixtures",
+  "private": true,
+  "description": "React SSR fixtures for tumu integration tests",
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}

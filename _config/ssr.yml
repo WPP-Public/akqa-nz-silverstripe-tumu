@@ -1,0 +1,16 @@
+---
+Name: tumu-react-ssr
+---
+Akqa\SilverStripe\SSR\ReactRenderer:
+  enabled: false
+  node_binary: node
+  entry: app/client/dist/ssr.js
+  timeout_ms: 5000
+  fallback_on_error: true
+  skip_when_vite_hot: true
+
+SilverStripe\Core\Injector\Injector:
+  Akqa\SilverStripe\SSR\ReactRenderer:
+    constructor:
+      nodeProcess: '%$Akqa\SilverStripe\SSR\NodeProcess'
+      logger: '%$Psr\Log\LoggerInterface'

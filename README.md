@@ -164,6 +164,269 @@ automatically included in the page requirements, while JavaScript files will be
 loaded as modules. This is useful for including print stylesheets, page-specific
 styles, or additional JavaScript modules.
 
+### React components (SSR)
+
+Tumu can optionally server-render React "islands" into Silverstripe templates,
+then hydrate them with the same Vite client bundle. This is **opt-in**: client-only
+mount nodes keep working without it.
+
+The approach is deliberately small. Silverstripe still owns the page. React
+renders named components (a banner, an accordion, a listing) rather than the
+whole site. PHP asks Node.js to `renderToString` a component from a Vite SSR
+bundle, wraps that HTML in a mount node, and the browser hydrates it.
+
+```
+Silverstripe template
+        │
+        ▼
+$ReactComponent('Banner', $BannerProps)
+        │
+        ├─ SSR off / Vite HMR / Node failure
+        │       → <div data-component="Banner" data-props="{...}"></div>
+        │
+        └─ SSR on
+                → Node runs app/client/dist/ssr.js
+                → <div data-component="Banner" data-props="{...}"><h1>...</h1></div>
+        │
+        ▼
+Client bundle hydrates [data-component] (hydrateRoot if the node has markup,
+createRoot if it is empty)
+```
+
+#### Enable it
+
+1. Node.js must be on the PATH of the **PHP** process (DDEV's web container is
+   fine; many PHP-only hosts are not).
+2. Build a Vite SSR entry that reads JSON from stdin and writes HTML to stdout
+   (see below).
+3. Turn it on:
+
+```
+SS_REACT_SSR_ENABLED="true"
+```
+
+Or in YAML:
+
+```yaml
+Akqa\SilverStripe\SSR\ReactRenderer:
+  enabled: true
+  entry: app/client/dist/ssr.js
+  node_binary: node
+  timeout_ms: 5000
+  fallback_on_error: true
+  skip_when_vite_hot: true
+```
+
+Optional env overrides: `SS_REACT_SSR_ENTRY`, `SS_REACT_SSR_NODE`,
+`SS_REACT_SSR_TIMEOUT` (milliseconds).
+
+#### Use it in templates
+
+Build props in PHP (JSON in `.ss` files is miserable):
+
+```php
+public function getBannerProps(): string
+{
+    return json_encode([
+        'title' => (string) $this->Title,
+    ], JSON_THROW_ON_ERROR);
+}
+```
+
+```html
+<% cached 'banner', $ID, $LastEdited %>
+$ReactComponent('Banner', $BannerProps)
+<% end_cached %>
+```
+
+That prints a mount node using the same `data-component` / `data-props`
+attributes as the [Vite starter](https://github.com/WPP-Public/akqa-nz-silverstripe-starter-vite-ddev),
+so existing client registries keep working. The global is already cast as
+`HTMLFragment` — do not add `.RAW`.
+
+From PHP:
+
+```php
+use Akqa\SilverStripe\SSR\ReactRenderer;
+
+$html = ReactRenderer::singleton()->render('Banner', [
+    'title' => $this->Title,
+]);
+```
+
+Partial caching around `$ReactComponent` is strongly recommended. Each SSR call
+spawns Node; caching the Silverstripe fragment is how this stays cheap.
+
+#### Project JavaScript contract
+
+Tumu ships the PHP side only. The project owns the React registry, the SSR
+entry, and hydration.
+
+SSR entry (`app/client/src/ssr.tsx`) — write to stdout with
+`process.stdout.write`, never `console.log` (a trailing newline becomes a text
+node and hydration warns):
+
+```ts
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
+import { registry } from "./state/Registry";
+
+function readStdin(): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        process.stdin.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+        process.stdin.on("end", () =>
+            resolve(Buffer.concat(chunks).toString("utf8"))
+        );
+        process.stdin.on("error", reject);
+    });
+}
+
+readStdin()
+    .then((raw) => {
+        const { component, props } = JSON.parse(raw) as {
+            component: string;
+            props: Record<string, unknown>;
+        };
+        const Component = registry[component];
+        if (!Component) {
+            process.stderr.write(`Unknown React component: ${component}\n`);
+            process.exit(1);
+        }
+        process.stdout.write(renderToString(createElement(Component, props)));
+    })
+    .catch((error) => {
+        process.stderr.write(String(error));
+        process.exit(1);
+    });
+```
+
+PHP sends `{"component":"Banner","props":{...}}` on stdin.
+
+Client hydration (`app/client/src/index.tsx`):
+
+```ts
+import { createElement } from "react";
+import { createRoot, hydrateRoot } from "react-dom/client";
+import { registry } from "./state/Registry";
+
+document.querySelectorAll<HTMLElement>("[data-component]").forEach((el) => {
+    const name = el.dataset.component;
+    const Component = name ? registry[name] : undefined;
+    if (!Component) {
+        return;
+    }
+    const props = JSON.parse(el.dataset.props || "{}");
+    const node = createElement(Component, props);
+    if (el.hasChildNodes()) {
+        hydrateRoot(el, node);
+    } else {
+        createRoot(el).render(node);
+    }
+});
+```
+
+Vite SSR build (second config so it does not wipe the client `dist`). Bundle
+dependencies (`ssr.noExternal: true`) so production only needs the generated
+file and `node`, not `node_modules` on the web host:
+
+```ts
+// vite.ssr.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+
+export default defineConfig({
+    plugins: [react()],
+    resolve: {
+        alias: { "@": path.resolve(__dirname, "./app/client/src/") },
+    },
+    ssr: {
+        noExternal: true,
+    },
+    publicDir: false,
+    build: {
+        ssr: "./app/client/src/ssr.tsx",
+        outDir: "./app/client/dist",
+        emptyOutDir: false,
+        copyPublicDir: false,
+        rollupOptions: {
+            output: {
+                format: "cjs",
+                entryFileNames: "ssr.js",
+            },
+        },
+    },
+});
+```
+
+```json
+{
+    "scripts": {
+        "build": "vite build && vite build --config vite.ssr.config.ts"
+    }
+}
+```
+
+When `SS_USE_VITE_DEV_SERVER=true`, Tumu **skips SSR** and emits an empty mount
+node. HMR stays fast and you avoid hydrating against a stale SSR bundle. To
+exercise SSR locally, build assets and set `SS_USE_VITE_DEV_SERVER=false`.
+
+#### Testing
+
+PHPUnit talks to a real Node process and `react-dom/server` when Node is on
+PATH and fixture deps are installed:
+
+```sh
+npm ci --prefix tests/SSR/fixtures
+vendor/bin/phpunit --group node
+```
+
+If Node or `tests/SSR/fixtures/node_modules` is missing, those tests are
+skipped. CI installs Node and the fixtures and sets `SSR_INTEGRATION=1` so a
+skip becomes a failure. Successful SSR must include the React markup inside the
+mount node; a thrown render, unknown component, or invalid bundle must fall
+back to an empty client mount.
+
+#### Limitations
+
+Treat these as product constraints, not temporary gaps:
+
+- **Node at request time.** PHP must be able to `proc_open` `node`. This is
+  normal on DDEV; it is not true of PHP-only PaaS images unless you add Node to
+  the web container. Tumu will not SSH to a remote Node service or talk HTTP to
+  a sidecar.
+- **Not a React meta-framework.** No file-based routing, streaming
+  (`renderToPipeableStream`), RSC, or data loaders. Silverstripe remains the
+  server. SSR here is `renderToString` for islands.
+- **Components must be isomorphic.** No `window`, `document`, `localStorage`,
+  or layout reads during the first render. `useEffect` / `useLayoutEffect` do
+  not run on the server. `Date.now()` and `Math.random()` cause hydration
+  mismatches — keep them in effects.
+- **Browser-only libraries.** Maps, carousels, and similar that assume a DOM
+  should stay client-only (empty mount node). SSR the content-ish islands
+  (headings, listings, FAQ copy); hydrate the widgets.
+- **CSS-in-JS and CSS modules** need extra SSR wiring (style collection,
+  class name stability). Prefer CSS imported through the Vite client bundle.
+- **JSON-serialisable props only.** No functions, class instances, or
+  DataObjects. Do not put secrets in props — they are printed into
+  `data-props` in the HTML.
+- **Hydration must match.** If SSR HTML and the client first render differ,
+  React will warn and may discard markup. Keep the registry identical on both
+  entries.
+- **Process cost.** Spawning Node per component is slow relative to PHP.
+  Cache the Silverstripe fragment. Do not SSR every icon or toggle.
+- **Failure mode.** With `fallback_on_error` (the default) a missing bundle,
+  timeout, or unknown component is logged and the empty mount node is returned
+  so the client can still render. Set `fallback_on_error: false` in dev if you
+  want that to throw.
+- **`proc_open` must be allowed.** Disabled `proc_open` in `php.ini` makes SSR
+  impossible.
+- **No streaming or chunked HTML.** The PHP request waits for the full string
+  (default timeout 5s).
+
+If those limits are a problem for a given component, skip SSR and keep the
+client-only `data-component` mount. That is the supported default.
 
 ## ❌ What tumu is not
 

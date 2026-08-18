@@ -9,3 +9,55 @@ jobs:
   ci:
     name: CI
     uses: silverstripe/gha-ci/.github/workflows/ci.yml@v2
+
+  ssr:
+    name: SSR (Node)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: SS_mysite
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: intl, gd, pdo_mysql, mysqli, bcmath
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/SSR/fixtures/package-lock.json
+
+      - name: Install PHP dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Install SSR fixtures
+        run: npm ci
+        working-directory: tests/SSR/fixtures
+
+      - name: Run SSR integration tests
+        env:
+          SSR_INTEGRATION: "1"
+          SS_ENVIRONMENT_TYPE: dev
+          SS_DATABASE_CLASS: MySQLDatabase
+          SS_DATABASE_SERVER: 127.0.0.1
+          SS_DATABASE_USERNAME: root
+          SS_DATABASE_PASSWORD: root
+          SS_DATABASE_NAME: SS_mysite
+        run: vendor/bin/phpunit --group node
