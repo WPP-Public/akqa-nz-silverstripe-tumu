@@ -164,6 +164,35 @@ automatically included in the page requirements, while JavaScript files will be
 loaded as modules. This is useful for including print stylesheets, page-specific
 styles, or additional JavaScript modules.
 
+#### Modulepreload for imported chunks
+
+Vite's production HTML is typically a tiny inline module:
+
+```html
+<script type="module">import '/_resources/app/client/dist/index-….js'</script>
+```
+
+Any file listed in that entry's `imports` in `manifest.json` (for example a
+`Registry` chunk, or a shared vendor chunk) is only discovered after `index.js`
+downloads and parses — an extra round trip on the critical path.
+
+`ViteProvider` emits `<link rel="modulepreload">` for those JS imports (and for
+imports of any additional JS entries from `getAdditionalRequirements()`). CSS
+imports are unchanged: they still go through `Requirements::css()`. No project
+code is required beyond using `<% include Vite %>`.
+
+If you render `Includes/ViteRequirements` yourself, pass `ModulePreloads` as well
+as `JSModules`:
+
+```php
+return $this->renderWith('Includes/ViteRequirements', [
+    'JSModules' => $jsModules,
+    'ModulePreloads' => $this->getViteModulePreloads($manifest, [
+        $this->getDefaultJsAsset(),
+    ]),
+]);
+```
+
 ### React components (SSR)
 
 Tumu can optionally server-render React "islands" into Silverstripe templates,

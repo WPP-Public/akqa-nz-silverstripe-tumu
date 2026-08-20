@@ -371,4 +371,103 @@ class ViteProviderTest extends SapphireTest
             }
         }
     }
+
+    public function testGetViteModulePreloadsIncludesJsImportsAndSkipsCss(): void
+    {
+        $this->testClass->setDistPath('app/client/dist/');
+
+        $manifest = [
+            'app/client/src/index.ts' => [
+                'file' => 'index-abc.js',
+                'imports' => [
+                    '_Registry-xyz.js',
+                    '_Registry-css.js',
+                    '_Loader-def.js',
+                    '_Registry-xyz.js',
+                ],
+            ],
+            '_Registry-xyz.js' => ['file' => 'Registry-xyz.js'],
+            '_Registry-css.js' => ['file' => 'Registry-xyz.css'],
+            '_Loader-def.js' => ['file' => 'Loader-def.js'],
+        ];
+
+        $preloads = $this->testClass->getViteModulePreloads($manifest, [
+            'app/client/src/index.ts',
+        ]);
+
+        $this->assertEquals(2, $preloads->count());
+        $this->assertEquals(
+            '/_resources/app/client/dist/Registry-xyz.js',
+            $preloads->first()->Asset
+        );
+        $this->assertEquals(
+            '/_resources/app/client/dist/Loader-def.js',
+            $preloads->last()->Asset
+        );
+    }
+
+    public function testGetViteModulePreloadsFromAdditionalJsEntries(): void
+    {
+        $manifest = [
+            'app/client/src/index.ts' => [
+                'file' => 'index-abc.js',
+            ],
+            'app/client/src/additional.jsx' => [
+                'file' => 'additional-ghi.js',
+                'imports' => ['_shared-jkl.js'],
+            ],
+            '_shared-jkl.js' => ['file' => 'shared-jkl.js'],
+        ];
+
+        $preloads = $this->testClass->getViteModulePreloads($manifest, [
+            'app/client/src/index.ts',
+            'app/client/src/additional.jsx',
+        ]);
+
+        $this->assertEquals(1, $preloads->count());
+        $this->assertEquals(
+            '/_resources/app/client/dist/shared-jkl.js',
+            $preloads->first()->Asset
+        );
+    }
+
+    public function testGetIncludeViteBuiltRequirementsEmitsModulePreloadLinks(): void
+    {
+        $manifestPath = Director::baseFolder() . '/app/client/dist/manifest.json';
+        $dir = dirname($manifestPath);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $manifestData = [
+            'app/client/src/index.css' => ['file' => 'index.css'],
+            'app/client/src/index.ts' => [
+                'file' => 'index.ts',
+                'imports' => ['_Registry-xyz.js'],
+            ],
+            '_Registry-xyz.js' => ['file' => 'Registry-xyz.js'],
+        ];
+
+        file_put_contents($manifestPath, json_encode($manifestData));
+
+        $mockCache = $this->createMock(CacheInterface::class);
+        $mockCache->method('has')->willReturn(false);
+        $mockCache->method('set')->willReturn(true);
+        $mockCache->method('get')->willReturn($manifestData);
+
+        Injector::inst()->registerService($mockCache, CacheInterface::class . '.ViteRequirementsManifest');
+
+        try {
+            $result = $this->testClass->getIncludeViteBuiltRequirements();
+
+            $this->assertStringContainsString('rel="modulepreload"', $result);
+            $this->assertStringContainsString('Registry-xyz.js', $result);
+            $this->assertStringContainsString('script type="module"', $result);
+        } finally {
+            if (file_exists($manifestPath)) {
+                unlink($manifestPath);
+            }
+        }
+    }
 }

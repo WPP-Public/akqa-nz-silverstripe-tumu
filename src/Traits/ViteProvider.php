@@ -241,6 +241,7 @@ trait ViteProvider
         $resourcesPath = '/_resources/';
 
         $jsModules = ArrayList::create();
+        $jsEntryKeys = [$this->defaultJsAsset];
 
         $jsModules->push(ArrayData::create([
             'Asset' => Controller::join_links($resourcesPath, $this->distPath, $manifest[$this->defaultJsAsset]['file'])
@@ -278,6 +279,7 @@ trait ViteProvider
                         Requirements::css($this->distPath . $manifest[$asset]['file'], $media, $opts);
                     }
                 } elseif (isset($manifest[$asset])) {
+                    $jsEntryKeys[] = $asset;
                     $jsModules->push(ArrayData::create([
                         'Asset' => Controller::join_links(
                             $resourcesPath,
@@ -306,7 +308,52 @@ trait ViteProvider
 
         return $this->renderWith('Includes/ViteRequirements', [
             'JSModules' => $jsModules,
+            'ModulePreloads' => $this->getViteModulePreloads($manifest, $jsEntryKeys),
         ]);
+    }
+
+
+    /**
+     * Build modulepreload hrefs for JS chunks listed in a Vite manifest
+     * entry's `imports`. The browser otherwise discovers those chunks only
+     * after the entry module downloads and parses.
+     *
+     * CSS imports are skipped — they are already included via {@link importCssAssets()}.
+     *
+     * @param array<string, mixed> $manifest
+     * @param array<int, string> $entryKeys
+     * @return ArrayList<ArrayData>
+     */
+    public function getViteModulePreloads(array $manifest, array $entryKeys): ArrayList
+    {
+        $preloads = ArrayList::create();
+        $seen = [];
+        $resourcesPath = '/_resources/';
+
+        foreach ($entryKeys as $entryKey) {
+            if (!isset($manifest[$entryKey]['imports']) || !is_array($manifest[$entryKey]['imports'])) {
+                continue;
+            }
+
+            foreach ($manifest[$entryKey]['imports'] as $importKey) {
+                if (!isset($manifest[$importKey]['file']) || !is_string($manifest[$importKey]['file'])) {
+                    continue;
+                }
+
+                $file = $manifest[$importKey]['file'];
+
+                if (!str_ends_with($file, '.js') || isset($seen[$file])) {
+                    continue;
+                }
+
+                $seen[$file] = true;
+                $preloads->push(ArrayData::create([
+                    'Asset' => Controller::join_links($resourcesPath, $this->distPath, $file),
+                ]));
+            }
+        }
+
+        return $preloads;
     }
 
 
