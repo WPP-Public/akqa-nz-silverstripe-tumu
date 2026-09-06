@@ -1,0 +1,17 @@
+---
+name: 'tumu-healthchecks'
+---
+SilverStripe\EnvironmentCheck\EnvironmentCheckSuite:
+  registered_checks:
+    db:
+      definition: 'DatabaseCheck("Page")'
+      title: 'Is the database accessible?'
+    url:
+      definition: 'URLCheck()'
+      title: 'Is the homepage accessible?'
+  registered_suites:
+    check:
+      - db
+    health:
+      - db
+      - url

@@ -24,17 +24,40 @@ truth and handle major version upgrades with a single dependency
 
 ## 🚀 Features Included
 
--   Silverstripe 6 CMS
--   Common functionality such as `TagField` and `Taxonomy` which we widely use.
--   Elemental
--   UserForms
--   [Menu
-    Manager](https://github.com/WPP-Public/akqa-nz-silverstripe-menumanager)
--   [Redirects](https://github.com/silverstripe/silverstripe-redirectedurls)
+-   Silverstripe CMS and a curated set of commonly used modules (see below)
 -   SEO related improvements (sitemaps, robots)
 -   Vite and SSR integration for building modern front-ends.
--   Extensions for common functionality (Sorting, )
+-   Extensions for common functionality (Sorting)
 -   🔨more to come
+
+| Module | Description |
+| --- | --- |
+| [silverstripe/framework](https://github.com/silverstripe/silverstripe-framework) | The Silverstripe framework |
+| [silverstripe/cms](https://github.com/silverstripe/silverstripe-cms) | The Silverstripe Content Management System |
+| [silverstripe/errorpage](https://github.com/silverstripe/silverstripe-errorpage) | Custom error pages in the CMS |
+| [silverstripe/userforms](https://github.com/silverstripe/silverstripe-userforms) | Drag-and-drop forms without writing PHP |
+| [dnadesign/silverstripe-elemental](https://github.com/silverstripe/silverstripe-elemental) | Elemental page type and content blocks |
+| [heyday/silverstripe-menumanager](https://github.com/WPP-Public/akqa-nz-silverstripe-menumanager) | Custom menu structures when the site tree is not enough |
+| [silverstripe/taxonomy](https://github.com/silverstripe/silverstripe-taxonomy) | Taxonomy for cataloguing content |
+| [silverstripe/tagfield](https://github.com/silverstripe/silverstripe-tagfield) | Tag field for the CMS |
+| [silverstripe/linkfield](https://github.com/silverstripe/silverstripe-linkfield) | Link management for the CMS |
+| [silverstripe/login-forms](https://github.com/silverstripe/silverstripe-login-forms) | Templates for the CMS login screens |
+| [silverstripe/htmleditor-tinymce](https://github.com/silverstripe/silverstripe-htmleditor-tinymce) | TinyMCE WYSIWYG editor |
+| [silverstripe/redirectedurls](https://github.com/silverstripe/silverstripe-redirectedurls) | CMS-managed URL redirects |
+| [wilr/silverstripe-googlesitemaps](https://github.com/wilr/silverstripe-googlesitemaps) | XML sitemaps for search engines |
+| [kinglozzer/metatitle](https://github.com/lozcalver/silverstripe-metatitle) | Meta title field for pages |
+| [silverstripe/sharedraftcontent](https://github.com/silverstripe/silverstripe-sharedraftcontent) | Share draft page content with non-CMS users |
+| [jonom/focuspoint](https://github.com/jonom/silverstripe-focuspoint) | Smarter automatic image cropping |
+| [unclecheese/display-logic](https://github.com/unclecheese/silverstripe-display-logic) | Show or hide form fields based on other field values |
+| [jonom/silverstripe-betternavigator](https://github.com/jonom/silverstripe-betternavigator) | Front-end admin and development utility menu |
+| [silverstripe/iframe](https://github.com/silverstripe/silverstripe-iframe) | iFrame page type for embedding another website |
+| [silverstripe/mfa](https://github.com/silverstripe/silverstripe-mfa) | Multi-factor authentication with backup codes |
+| [silverstripe/totp-authenticator](https://github.com/silverstripe/silverstripe-totp-authenticator) | TOTP authenticator for use with MFA |
+| [silverstripe/spamprotection](https://github.com/silverstripe/silverstripe-spamprotection) | Spam protection for forms |
+| [silverstripe/environmentcheck](https://github.com/silverstripe/silverstripe-environmentcheck) | API for building environment / health checks |
+| [symbiote/silverstripe-queuedjobs](https://github.com/silverstripe/silverstripe-queuedjobs) | Background jobs run through a queue |
+| [nesbot/carbon](https://github.com/CarbonPHP/carbon) | DateTime API extension |
+| [larapack/dd](https://github.com/larapack/dd) | `dd()` dump-and-die helper |
 
 ### Project Setup
 

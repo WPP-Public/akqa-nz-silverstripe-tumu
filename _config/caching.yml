@@ -1,3 +1,6 @@
+---
+name: 'tumu-caching'
+---
 SilverStripe\Core\Injector\Injector:
   Psr\SimpleCache\CacheInterface.ViteRequirementsManifest:
     factory: SilverStripe\Core\Cache\CacheFactory
