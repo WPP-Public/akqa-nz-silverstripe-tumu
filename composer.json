@@ -21,6 +21,7 @@
         "symbiote/silverstripe-queuedjobs": "^6",
         "jonom/silverstripe-betternavigator": "^7",
         "wilr/silverstripe-googlesitemaps": "^4",
+        "wilr/silverstripe-togglegroup-field": "dev-main",
         "unclecheese/display-logic": "^4",
         "silverstripe/redirectedurls": "^4",
         "silverstripe/sharedraftcontent": "^4",
