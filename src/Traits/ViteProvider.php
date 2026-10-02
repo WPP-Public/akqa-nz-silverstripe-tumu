@@ -142,6 +142,24 @@ trait ViteProvider
 
 
     /**
+     * Returns the command to run a package.json script with the configured
+     * package manager. yarn and pnpm run scripts directly (`yarn dev`), while
+     * npm and others need `run` (`npm run dev`).
+     *
+     * @param string $script
+     * @return string
+     */
+    public function getPackageManagerCommand(string $script): string
+    {
+        if (in_array($this->packageManager, ['yarn', 'pnpm'], true)) {
+            return sprintf('%s %s', $this->packageManager, $script);
+        }
+
+        return sprintf('%s run %s', $this->packageManager, $script);
+    }
+
+
+    /**
      * @return array<string, array<string, string>>
      */
     public function buildRequirementsManifest(): array
@@ -150,24 +168,24 @@ trait ViteProvider
 
         if (!file_exists($manifestFile)) {
             throw new Exception(sprintf(
-                'client/dist/manifest.json does not exist. Please run `%s build`',
-                $this->packageManager
+                'client/dist/manifest.json does not exist. Please run `%s`',
+                $this->getPackageManagerCommand('build')
             ));
         }
 
         $content = file_get_contents($manifestFile);
         if ($content === false) {
             throw new Exception(sprintf(
-                'client/dist/manifest.json could not be read. Please run `%s build`',
-                $this->packageManager
+                'client/dist/manifest.json could not be read. Please run `%s`',
+                $this->getPackageManagerCommand('build')
             ));
         }
         $manifest = json_decode($content, true);
 
         if (!$manifest) {
             throw new Exception(sprintf(
-                'client/dist/manifest.json is not valid JSON. Please run `%s build`',
-                $this->packageManager
+                'client/dist/manifest.json is not valid JSON. Please run `%s`',
+                $this->getPackageManagerCommand('build')
             ));
         }
 
@@ -226,9 +244,9 @@ trait ViteProvider
 
         if (!isset($manifest[$this->defaultJsAsset])) {
             throw new Exception(sprintf(
-                '%s is missing from client/dist/manifest.json. Please run `%s build`',
+                '%s is missing from client/dist/manifest.json. Please run `%s`',
                 $this->defaultJsAsset,
-                $this->packageManager
+                $this->getPackageManagerCommand('build')
             ));
         }
 

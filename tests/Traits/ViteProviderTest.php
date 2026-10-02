@@ -48,6 +48,37 @@ class ViteProviderTest extends SapphireTest
         $this->assertEquals('test.jsx', $this->testClass->getDefaultJsAsset());
     }
 
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function packageManagerCommandProvider(): array
+    {
+        return [
+            'yarn' => ['yarn', 'yarn dev'],
+            'pnpm' => ['pnpm', 'pnpm dev'],
+            'npm' => ['npm', 'npm run dev'],
+            'bun' => ['bun', 'bun run dev'],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('packageManagerCommandProvider')]
+    public function testGetPackageManagerCommand(string $packageManager, string $expected): void
+    {
+        $this->testClass->setPackageManager($packageManager);
+
+        $this->assertEquals($expected, $this->testClass->getPackageManagerCommand('dev'));
+    }
+
+    public function testBuildRequirementsManifestWithMissingFileUsesNpmRun(): void
+    {
+        $this->testClass->setPackageManager('npm');
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('client/dist/manifest.json does not exist. Please run `npm run build`');
+
+        $this->testClass->buildRequirementsManifest();
+    }
+
     public function testBuildRequirementsManifestWithMissingFile(): void
     {
         $this->expectException(Exception::class);
