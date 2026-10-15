@@ -7,7 +7,6 @@ namespace Akqa\SilverStripe\Tests\SSR;
 use Akqa\SilverStripe\SSR\NodeProcess;
 use Akqa\SilverStripe\SSR\ReactComponentProvider;
 use Akqa\SilverStripe\SSR\ReactRenderer;
-use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SilverStripe\Core\Environment;
@@ -19,8 +18,9 @@ use SilverStripe\Dev\SapphireTest;
  *
  * Skipped unless Node is on PATH and `npm ci` has been run in tests/SSR/fixtures.
  * CI sets SSR_INTEGRATION=1 so a missing Node or fixtures fails instead of skipping.
+ *
+ * @group node
  */
-#[Group('node')]
 class ReactRendererNodeTest extends SapphireTest
 {
     protected string $nodeBinary = 'node';

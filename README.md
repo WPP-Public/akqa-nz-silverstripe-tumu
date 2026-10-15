@@ -24,7 +24,7 @@ truth and handle major version upgrades with a single dependency
 
 ## 🚀 Features Included
 
--   Silverstripe 6 CMS
+-   Silverstripe 5 CMS (this `5` branch; `main` is Silverstripe 6)
 -   Common functionality such as `TagField` and `Taxonomy` which we widely use.
 -   Elemental
 -   UserForms

@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Model\ArrayData;
+use SilverStripe\View\ArrayData;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 
 class ReactRendererTest extends SapphireTest

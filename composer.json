@@ -7,42 +7,41 @@
         "bin/tag_release"
     ],
     "require": {
-        "silverstripe/framework": "^6.2",
-        "silverstripe/cms": "^6.2",
-        "silverstripe/errorpage": "^3",
-		"silverstripe/userforms": "^7",
-        "dnadesign/silverstripe-elemental": "^6",
-        "heyday/silverstripe-menumanager": "^6",
+        "silverstripe/framework": "^5.4",
+        "silverstripe/cms": "^5.4",
+        "silverstripe/errorpage": "^2",
+        "silverstripe/userforms": "^6",
+        "dnadesign/silverstripe-elemental": "^5",
+        "heyday/silverstripe-menumanager": "^4",
         "larapack/dd": "^1.1",
-        "silverstripe/taxonomy": "^4",
-        "silverstripe/tagfield": "^4",
-        "silverstripe/environmentcheck": "^4",
-        "silverstripe/login-forms": "^6",
-        "symbiote/silverstripe-queuedjobs": "^6",
-        "jonom/silverstripe-betternavigator": "^7",
-        "wilr/silverstripe-googlesitemaps": "^4",
-        "wilr/silverstripe-togglegroup-field": "dev-main",
-        "unclecheese/display-logic": "^4",
-        "silverstripe/redirectedurls": "^4",
-        "silverstripe/sharedraftcontent": "^4",
-        "silverstripe/htmleditor-tinymce": "^1",
-        "silverstripe/totp-authenticator": "^6.0",
-        "jonom/focuspoint": "^6",
-        "silverstripe/linkfield": "^5",
-        "silverstripe/mfa": "^6.1",
-        "silverstripe/spamprotection": "^5.0",
+        "silverstripe/taxonomy": "^3",
+        "silverstripe/tagfield": "^3",
+        "silverstripe/environmentcheck": "^3",
+        "silverstripe/login-forms": "^5",
+        "symbiote/silverstripe-queuedjobs": "^5",
+        "jonom/silverstripe-betternavigator": "^6",
+        "wilr/silverstripe-googlesitemaps": "^3",
+        "wilr/silverstripe-togglegroup-field": "*",
+        "unclecheese/display-logic": "^3",
+        "silverstripe/redirectedurls": "^3",
+        "silverstripe/sharedraftcontent": "^3",
+        "silverstripe/totp-authenticator": "^5",
+        "jonom/focuspoint": "^5",
+        "silverstripe/linkfield": "^4",
+        "silverstripe/mfa": "^5",
+        "silverstripe/spamprotection": "^4",
         "nesbot/carbon": "^3.11",
-        "kinglozzer/metatitle": "^4.0",
-        "silverstripe/iframe": "^4.0"
+        "kinglozzer/metatitle": "^3",
+        "silverstripe/iframe": "^3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11",
-        "cambis/silverstan": "^2",
-        "silverstripe/behat-extension": "^6.1"
+        "phpunit/phpunit": "^9.6",
+        "cambis/silverstan": "^1",
+        "silverstripe/behat-extension": "^5"
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "6.x-dev"
+            "dev-5": "5.x-dev"
         }
     },
     "autoload": {

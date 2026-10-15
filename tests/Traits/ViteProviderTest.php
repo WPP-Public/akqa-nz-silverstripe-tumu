@@ -8,8 +8,8 @@ use SilverStripe\Control\Director;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Model\ArrayData;
-use SilverStripe\Model\List\ArrayList;
+use SilverStripe\View\ArrayData;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\Requirements;
 
 class ViteProviderTest extends SapphireTest
@@ -61,7 +61,9 @@ class ViteProviderTest extends SapphireTest
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('packageManagerCommandProvider')]
+    /**
+     * @dataProvider packageManagerCommandProvider
+     */
     public function testGetPackageManagerCommand(string $packageManager, string $expected): void
     {
         $this->testClass->setPackageManager($packageManager);
