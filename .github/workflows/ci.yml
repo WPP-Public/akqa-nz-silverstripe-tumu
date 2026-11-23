@@ -9,6 +9,10 @@ jobs:
   ci:
     name: CI
     uses: silverstripe/gha-ci/.github/workflows/ci.yml@v2
+    with:
+      # The generated matrix still selects installer 6.2.x-dev. supported-modules 2.1.1
+      # does not list CMS 6.3, and the workflow only retries older installers after a conflict.
+      composer_require_extra: silverstripe/installer:6.3.x-dev
 
   ssr:
     name: SSR (Node)
